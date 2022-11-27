@@ -1,13 +1,13 @@
 from graphviz import Digraph
 
 def get_graph(node):
-    graph = Digraph()
+    graph = Digraph(strict=True)
     graph.attr(rankdir='LR')
     def _draw(node):
         # Put node into graph   
         node_id = f'{id(node)}'
-        label = f'{node.label} | {node.data}' if node.label else f'{node.data}'
-        graph.node(node_id, label)
+        label = f'<f0> {node.label}|<f1> {node.data}|<f2> {node.grad}' if node.label else f'<f1> {node.data}|<f2> {node.grad}'
+        graph.node(node_id, label, shape='record', rankdir='LR')
         # Return if it's leaf node
         if node._prev == None:
             return
@@ -20,10 +20,10 @@ def get_graph(node):
             op_id = f'{node_id}{node._op}{x_id}{y_id}'
             graph.node(op_id, node._op)
             # Connect opeartion node to the main node
-            graph.edge(op_id, node_id)
+            graph.edge(op_id, f'{node_id}:f1')
             # Connect child nodes to the operation
-            graph.edge(x_id, op_id)
-            graph.edge(y_id, op_id)
+            graph.edge(f'{x_id}:f1', op_id)
+            graph.edge(f'{y_id}:f1', op_id)
             _draw(x)
             _draw(y)
         if len(node._prev) == 1:
@@ -34,9 +34,9 @@ def get_graph(node):
             op_id = f'{node_id}{node._op}{x_id}'
             graph.node(op_id, node._op)
             # Connect opeartion node to the main node
-            graph.edge(op_id, node_id)
+            graph.edge(op_id, f'{node_id}:f1')
             # Connect child node to the operation
-            graph.edge(x_id, op_id)
+            graph.edge(f'{x_id}:f1', op_id)
             _draw(x)
     _draw(node)
     return graph
