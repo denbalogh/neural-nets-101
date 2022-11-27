@@ -1,8 +1,8 @@
 from graphviz import Digraph
 
-def draw(node):
+def get_graph(node):
     graph = Digraph()
-    graph.attr(rankdir='LR', size='8,5')
+    graph.attr(rankdir='LR')
     def _draw(node):
         # Put node into graph   
         node_id = f'{id(node)}'
