@@ -6,7 +6,7 @@ def get_graph(node):
     def _draw(node):
         # Put node into graph   
         node_id = f'{id(node)}'
-        label = f'<f0> {node.label}|<f1> {node.data}|<f2> {node.grad}' if node.label else f'<f1> {node.data}|<f2> {node.grad}'
+        label = f'<f0> {node.label}|<f1> {node.data:.4f}|<f2> {node.grad:.4f}' if node.label else f'<f1> {node.data:.4f}|<f2> {node.grad:.4f}'
         graph.node(node_id, label, shape='record', rankdir='LR')
         # Return if it's leaf node
         if node._prev == None:
