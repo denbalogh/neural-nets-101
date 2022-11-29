@@ -11,7 +11,7 @@ class Value:
         self._backward = lambda: None
     
     def __repr__(self):
-        return f'Value(data={self.data},label={self.label})'
+        return f'Value(data={self.data:.4f},label={self.label})'
     
     # Unary operations
     
