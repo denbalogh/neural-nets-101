@@ -27,4 +27,17 @@ class Layer:
         return [n(values) for n in self.neurons]
     
     def parameters(self):
-        return [n.parameters() for n in self.neurons]
+        return [p for n in self.neurons for p in n.parameters()]
+
+class MLP:
+    def __init__(self, nin, layers, activation='sigmoid'):
+        layers = [nin] + layers
+        self.layers = [Layer(layers[idx], layers[idx + 1], activation) for idx in range(len(layers) - 1)]
+        
+    def forward(self, values):
+        for layer in self.layers:
+            values = layer(values)
+        return values
+    
+    def parameters(self):
+        return [p for layer in self.layers for p in layer.parameters()]
