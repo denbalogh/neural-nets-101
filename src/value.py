@@ -1,12 +1,10 @@
-from math import exp
+from math import exp, log
 class Value:
     def __init__(self, data, label='', _op='', _prev=None):
         self.data = data
-        # Graph variables
         self.label = label
         self._op = _op
         self._prev = _prev
-        # Backpropagation variables
         self.grad = 0
         self._backward = lambda: None
     
@@ -57,13 +55,34 @@ class Value:
         return self * other**(-1)
     
     def __pow__(self, exponent):
-        out = Value(self.data ** exponent, _op=f'exp({exponent})', _prev=(self,))
+        out = Value(self.data ** exponent, _op=f'pow({exponent})', _prev=(self,))
         
         def _backward():
             self.grad += out.grad * exponent * self.data ** (exponent - 1)
         out._backward = _backward
         
         return out
+    
+    def exp(self):
+        data = exp(self.data)
+        out = Value(data, _op='exp', _prev=(self,))
+        
+        def _backward():
+            self.grad += out.grad * out.data
+        out._backward = _backward
+        
+        return out
+    
+    def log(self):
+        data = log(self.data)
+        out = Value(data, _op='log', _prev=(self,))
+        
+        def _backward():
+            self.grad += out.grad / self.data
+        out._backward = _backward
+        
+        return out
+
 
     # Reverse binary operations
     def __radd__(self, other):
@@ -95,6 +114,26 @@ class Value:
         
         def _backward():
             self.grad += out.grad * (1 - out.data ** 2)
+        out._backward = _backward
+        
+        return out
+    
+    def relu(self):
+        data = self.data if self.data > 0 else 0
+        out = Value(data, _op='relu', _prev=(self,))
+        
+        def _backward():
+            self.grad += out.grad * (1 if out.data >= 0 else 0)
+        out._backward = _backward
+        
+        return out
+    
+    def leaky_relu(self):
+        data = self.data if self.data > 0 else 0.01 * self.data
+        out = Value(data, _op='leaky_relu', _prev=(self,))
+        
+        def _backward():
+            self.grad += out.grad * (1 if out.data > 0 else 0.01)
         out._backward = _backward
         
         return out

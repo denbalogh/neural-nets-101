@@ -1,7 +1,5 @@
 def backpropagate(node):
-    # Initialize last node gradient to 1
     node.grad = 1
-    # Calculate gradients for all nodes
     def _backpropagate(node):
         if node._prev == None:
             return
@@ -10,17 +8,20 @@ def backpropagate(node):
             _backpropagate(prev)
     _backpropagate(node)
 
-def train(model, x, y_label, lr=0.01):
-    # Set gradients to 0
+def train(model, x, y_label, lr=0.01, loss_func='mns'):
     for p in model.parameters():
         p.grad = 0
-    # Forward pass
+        
     y = model.forward(x)
-    # Calculate loss
-    loss = mean_squared_error(y, y_label)
-    # Backward pass
+    
+    loss = 0
+    if loss_func == 'mns':
+        loss = mean_squared_error(y, y_label)
+    elif loss_func == 'ce':
+        loss = cross_entropy(y, y_label)
+        
     backpropagate(loss)
-    # Update weights
+    
     for p in model.parameters():
         p.data -= lr * p.grad
     return loss
@@ -29,3 +30,7 @@ def train(model, x, y_label, lr=0.01):
 
 def mean_squared_error(y, y_label):
     return sum([(y_label - y)**2 for y_label, y in zip(y_label, y)]) / len(y)
+
+def cross_entropy(y, y_label):
+    loss = -sum([y_label * y.log() for y_label, y in zip(y_label, y)])
+    return loss / len(y)
